@@ -8,7 +8,8 @@ const orderConfirmation = document.getElementById('order-confirmation');
 const orderSummary = document.getElementById('order-summary');
 const restaurantsData = [
 { name: 'dhaba', menu: ['chappathy', 'channa', 'naan'] },
-{ name: 'arabi', menu: ['noodles', 'chicken', 'chops'] },
+{ name: 'arabi restaurant', menu: ['noodles', 'chicken', 'chops'] },
+  {name: 'chinese restaurant', menu: ['noodles', 'chicken fried rice', 'chicken kebab']},  
 // Add more restaurants and menu items
 ];
 // Display list of restaurants

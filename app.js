@@ -1,104 +1,109 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="styles.css">
-    <title>Food Delivery</title>
-</head>
-<body>
-    <header>
-        <h1>quickbite</h1>
-        <div id="auth">
-            <span id="user-info"></span>
-            <button id="login-btn">Login</button>
-            <button id="logout-btn" style="display:none;">Logout</button>
-        </div>
-    </header>
-    <main>  
-        <div id="restaurants">
-            <h2>Restaurants</h2>
-            <div class="restaurant">
-                <h3>Arabi Restaurant</h3>
-                <div class="food-item" data-price="150">
-                    <img src="briyani.jpg" alt="biriyani">
-                    <p>Biriyani</p>
-                    <input type="number" class="quantity" value="1" min="1">
-                    <button class="order-btn">Order - 150</button>
-                </div>
-                <div class="food-item" data-price="120">
-                    <img src="burger.jpg" alt="burger">
-                    <p>Burger</p>
-                    <input type="number" class="quantity" value="1" min="1">
-                    <button class="order-btn">Order - 120</button>
-                </div>
-            </div>
-            <div class="restaurant">
-                <h3>Jeevan Restaurant</h3>
-                <div class="food-item" data-price="30">
-                    <img src="chappathi.jpg" alt="chappathi">
-                    <p>Chappathi</p>
-                    <input type="number" class="quantity" value="1" min="1">
-                    <button class="order-btn">Order - 30</button>
-                </div>
-                <div class="food-item" data-price="15">
-                    <img src="dosa.jpg" alt="dosa">
-                    <p>Dosa</p>
-                    <input type="number" class="quantity" value="1" min="1">
-                    <button class="order-btn">Order - 15</button>
-                </div>
-            </div>
-        </div>
-        <div id="restaurants">
-            
-            <div class="restaurant">
-                <h3>kfc Restaurant</h3>
-                <div class="food-item" data-price="150">
-                    <img src="chick.jpeg" alt="fried chicken">
-                    <p>fried chicken</p>
-                    <input type="number" class="quantity" value="1" min="1">
-                    <button class="order-btn">Order - 300</button>
-                </div>
-                <div class="food-item" data-price="120">
-                    <img src="_frenchfrieslar.png" alt="burger">
-                    <p>french fries</p>
-                    <input type="number" class="quantity" value="1" min="1">
-                    <button class="order-btn">Order - 250</button>
-                </div>
-            </div>
+const users = {
+    user1: 'pass1',
+    user2: 'pass2',
+    user3: 'pass3',
+    user4: 'pass4',
+    user5: 'pass5'
+};
 
-        <div id="order-summary" style="display:none;">
-            <h2>Your Order</h2>
-            <div id="order-items"></div>
-            <h3>Total: $<span id="total-amount">0</span></h3>
-        </div>
+let loggedInUser = null;
+let orderItems = [];
+let totalAmount = 0;
+let customerDetails = {};
 
-        <div id="customer-details" style="display:none;">
-            <h2>Enter Delivery Details</h2>
-            <form id="delivery-form">
-                <label for="address">Address:</label>
-                <input type="text" id="address" required><br>
-                <label for="contact">Contact Number:</label>
-                <input type="tel" id="contact" required><br>
-                <button id="submit-details" type="submit">Submit Details</button>
-            </form>
-        </div>
+document.getElementById('login-btn').addEventListener('click', () => {
+    const username = prompt('Enter username:');
+    const password = prompt('Enter password:');
 
-        <div id="payment" style="display:none;">
-            <h2>Payment Method</h2>
-            <select id="payment-method">
-                <option value="cod">Cash on Delivery</option>
-                <option value="online">Online Payment</option>
-            </select>
-            <div id="upi-options" style="display:none;">
-                <h3>UPI Options</h3>
-                <button>GPay</button>
-                <button>PhonePe</button>
-                <button>Paytm</button>
-            </div>
-            <button id="confirm-order">Confirm Order</button>
-        </div>
-    </main>
-    <script src="app.js"></script>
-</body>
-</html>
+    if (users[username] && users[username] === password) {
+        loggedInUser = username;
+        document.getElementById('user-info').textContent = `Logged in as ${username}`;
+        document.getElementById('login-btn').style.display = 'none';
+        document.getElementById('logout-btn').style.display = 'inline';
+        alert('Login successful!');
+    } else {
+        alert('Invalid username or password.');
+    }
+});
+
+document.getElementById('logout-btn').addEventListener('click', () => {
+    loggedInUser = null;
+    document.getElementById('user-info').textContent = '';
+    document.getElementById('login-btn').style.display = 'inline';
+    document.getElementById('logout-btn').style.display = 'none';
+    alert('Logged out successfully.');
+});
+
+document.querySelectorAll('.order-btn').forEach(button => {
+    button.addEventListener('click', (e) => {
+        if (!loggedInUser) {
+            alert('Please log in to order.');
+            return;
+        }
+
+        const foodItem = e.target.parentElement;
+        const itemName = foodItem.querySelector('p').textContent;
+        const price = parseInt(foodItem.getAttribute('data-price'));
+        const quantity = parseInt(foodItem.querySelector('.quantity').value);
+        const totalItemPrice = price * quantity;
+
+        orderItems.push({ name: itemName, quantity, price: totalItemPrice });
+        totalAmount += totalItemPrice;
+
+        updateOrderSummary();
+        document.getElementById('order-summary').style.display = 'block';
+        document.getElementById('customer-details').style.display = 'block';
+    });
+});
+
+function updateOrderSummary() {
+    const orderList = document.getElementById('order-items');
+    orderList.innerHTML = '';
+    orderItems.forEach(item => {
+        const orderItem = document.createElement('div');
+        orderItem.classList.add('order-item');
+        orderItem.innerHTML = `
+            <span>${item.name} (x${item.quantity})</span>
+            <span>$${item.price}</span>
+        `;
+        orderList.appendChild(orderItem);
+    });
+    document.getElementById('total-amount').textContent = totalAmount;
+}
+
+document.getElementById('delivery-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    
+    const address = document.getElementById('address').value;
+    const contact = document.getElementById('contact').value;
+
+    if (address && contact) {
+        customerDetails = { address, contact };
+        document.getElementById('payment').style.display = 'block';
+        alert('Delivery details submitted.');
+    } else {
+        alert('Please fill in your address and contact details.');
+    }
+});
+
+document.getElementById('payment-method').addEventListener('change', (e) => {
+    const upiOptions = document.getElementById('upi-options');
+    upiOptions.style.display = e.target.value === 'online' ? 'block' : 'none';
+});
+
+document.getElementById('confirm-order').addEventListener('click', () => {
+    if (!customerDetails.address || !customerDetails.contact) {
+        alert('Please submit your delivery details before confirming the order.');
+        return;
+    }
+
+    alert(`Order confirmed!\nTotal: $${totalAmount}\nDelivery to: ${customerDetails.address}\nContact: ${customerDetails.contact}`);
+    // Reset after confirmation
+    orderItems = [];
+    totalAmount = 0;
+    customerDetails = {};
+    updateOrderSummary();
+    document.getElementById('order-summary').style.display = 'none';
+    document.getElementById('payment').style.display = 'none';
+    document.getElementById('customer-details').style.display = 'none';
+});
